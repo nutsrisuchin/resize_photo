@@ -8,6 +8,19 @@ import matplotlib.pyplot as plt
 
 # ... [Previous utility functions]
 
+def visualize_drive_space(drive, drive_info):
+    df = pd.DataFrame({
+        'Space': ['Used', 'Free'],
+        'GB': [drive_info['used'] / (1024**3), drive_info['free'] / (1024**3)]
+    })
+    
+    fig, ax = plt.subplots()
+    df.set_index('Space').plot(kind='bar', ax=ax, legend=False)
+    plt.title(f"Drive: {drive} Usage")
+    plt.ylabel("Size (GB)")
+    plt.xticks(rotation=0)
+    st.pyplot(fig)
+
 # Visualization function for subfolder comparison
 def visualize_subfolder_comparison(subfolders):
     folder_sizes = [f['size'] for f in subfolders]
