@@ -3,6 +3,14 @@ import json
 import pandas as pd
 import plotly.express as px
 
+
+# Load data
+with open("drive_data.json", "r") as f:
+    drive_data = json.load(f)
+
+# Debug: Print out a portion of the data to see if it's read correctly
+st.write(drive_data)
+
 BYTES_IN_GB = 1e9  # 1 GB = 1e9 bytes
 
 # Load data from JSON
