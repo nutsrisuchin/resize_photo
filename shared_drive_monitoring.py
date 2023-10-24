@@ -1,9 +1,9 @@
 import streamlit as st
 import json
 import pandas as pd
-import os
+import plotly.express as px
 
-BYTES_IN_GB = 1e9  # 1 GB = 1e9 bytes
+YTES_IN_GB = 1e9  # 1 GB = 1e9 bytes
 
 # Load data from JSON
 with open("drive_data.json", "r") as f:
@@ -38,13 +38,17 @@ def app():
                 file_type_df["Size"] = file_type_df["Size"] / BYTES_IN_GB
                 st.table(file_type_df)
                 break
-    
+
     # Pie chart for space used by 1-level subfolders
     st.subheader("Space Distribution of 1-level Subfolders")
     folder_names = [sf["name"] for sf in drive_data["subfolders"]]
     folder_sizes = [sf["size"] for sf in drive_data["subfolders"]]
-    st.pie_chart(pd.Series(folder_sizes, index=folder_names))
+    
+    # Using Plotly to create the pie chart
+    fig = px.pie(values=folder_sizes, names=folder_names, title="Space Distribution of 1-level Subfolders")
+    st.plotly_chart(fig)
 
 if __name__ == "__main__":
     app()
+
 
