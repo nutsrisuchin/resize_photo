@@ -3,44 +3,37 @@ import json
 import streamlit as st
 import pandas as pd
 
+# Conversion Functions
+def bytes_to_mb(size_in_bytes):
+    return size_in_bytes / (2**20)  # Convert bytes to megabytes
 
 # Visualization Functions
 def display_folder_data(folders, level=1):
-    """
-    Display folder data recursively.
-    """
+    # Ensure sizes are converted to MB for display
     for folder in folders:
-        st.write(f"{'  ' * level}Folder: {folder['name']}, Size: {convert_bytes_to_readable(folder['size'])}")
-        if level < 2:  # If you want to increase the depth, modify this value
-            display_folder_data(folder['subfolders'], level + 1)
+        folder_size = bytes_to_mb(folder["size"])
+        st.write(f"{'--' * level} {folder['name']} - {folder_size:.2f} MB")
+        if "subfolders" in folder:
+            display_folder_data(folder["subfolders"], level + 1)
 
 def visualize_drive_space(drive, drive_info):
-    df = pd.DataFrame({
-        'Space': ['Used', 'Free'],
-        'GB': [drive_info['used'] / (1024**3), drive_info['free'] / (1024**3)]
-    })
+    # Convert drive info sizes to MB for display
+    total_mb = bytes_to_mb(drive_info["total"])
+    used_mb = bytes_to_mb(drive_info["used"])
+    free_mb = bytes_to_mb(drive_info["free"])
     
-    fig, ax = plt.subplots()
-    df.set_index('Space').plot(kind='bar', ax=ax, legend=False)
-    plt.title(f"Drive: {drive} Usage")
-    plt.ylabel("Size (GB)")
-    plt.xticks(rotation=0)
-    st.pyplot(fig)
+    st.write(f"Total space on {drive}: {total_mb:.2f} MB")
+    st.write(f"Used space on {drive}: {used_mb:.2f} MB")
+    st.write(f"Free space on {drive}: {free_mb:.2f} MB")
 
 def visualize_file_type_sizes(file_types):
-    file_type_df = pd.DataFrame(list(file_types.items()), columns=['File Type', 'Size (MB)'])
+    file_type_data = {f_type: bytes_to_mb(f_size) for f_type, f_size in file_types.items()}
+    file_type_df = pd.DataFrame(list(file_type_data.items()), columns=['File Type', 'Size (MB)'])
     st.table(file_type_df.sort_values('Size (MB)', ascending=False))
 
-# Extract data
-shared_drives = ["N:\\T-II\\99 Public\\"]
-data = {}
-
-for drive in shared_drives:
-    data[drive] = {
-        "drive_info": get_drive_space(drive),
-        "subfolders": get_subfolder_sizes(drive),
-        "file_types": get_file_type_sizes(drive)
-    }
+# Load extracted data from JSON
+with open("drive_data.json", "r") as f:
+    data = json.load(f)
 
 # Streamlit Visualization
 st.title("Shared Drive Monitoring")
