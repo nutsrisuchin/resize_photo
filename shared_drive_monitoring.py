@@ -6,8 +6,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ... [Previous utility functions]
-
 def visualize_drive_space(drive, drive_info):
     df = pd.DataFrame({
         'Space': ['Used', 'Free'],
@@ -21,7 +19,16 @@ def visualize_drive_space(drive, drive_info):
     plt.xticks(rotation=0)
     st.pyplot(fig)
 
-# Visualization function for subfolder comparison
+def display_folder_data(folders, level=1):
+    """Recursively display folder sizes"""
+    for folder in folders:
+        size_gb = folder['size'] / (1024**3)
+        st.write(f"{'--'*level} 📁 {folder['name']} - {size_gb:.2f} GB")
+        
+        # Recurse into subfolders if they exist, and if we're not too deep
+        if 'subfolders' in folder and level < 3:
+            display_folder_data(folder['subfolders'], level + 1)
+
 def visualize_subfolder_comparison(subfolders):
     folder_sizes = [f['size'] for f in subfolders]
     folder_names = [f['name'] for f in subfolders]
@@ -66,8 +73,6 @@ def app():
             st.write("\n")
             st.write("### Subfolder Sizes")
             display_folder_data(drive_data["subfolders"])
-
-# ... [App Execution]
 
 if __name__ == "__main__":
     app()
