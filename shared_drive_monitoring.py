@@ -21,11 +21,27 @@ def get_file_type_sizes(path):
     return sorted(file_sizes.items(), key=lambda x: x[1], reverse=True)
 
 def visualize_drive_space(drive, drive_info):
-    # ... [SAME AS PREVIOUS]
+    df = pd.DataFrame({
+        'Space': ['Used', 'Free'],
+        'GB': [drive_info['used'] / (1024**3), drive_info['free'] / (1024**3)]
+    })
+    
+    fig, ax = plt.subplots()
+    df.set_index('Space').plot(kind='bar', ax=ax, legend=False)
+    plt.title(f"Drive: {drive} Usage")
+    plt.ylabel("Size (GB)")
+    plt.xticks(rotation=0)
+    st.pyplot(fig)
 
 def display_folder_data(folders, level=1):
-    """Recursively display folder sizes"""
-    # [NOTE: This function is retained but not used in the app function]
+    """
+    Display folder data recursively.
+    """
+    for folder in folders:
+        st.write(f"{'  ' * level}Folder: {folder['name']}, Size: {convert_bytes_to_readable(folder['size'])}")
+        if level < 2:  # If you want to increase the depth, modify this value
+            display_folder_data(folder['subfolders'], level + 1)
+
 
 def visualize_subfolder_comparison(subfolders):
     # [NOTE: Modified to show only 1 level]
